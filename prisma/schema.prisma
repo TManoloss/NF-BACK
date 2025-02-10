@@ -19,3 +19,14 @@ model Admin {
   email String @unique
   senha String
 }
+model Funcionario {
+  id       Int      @id @default(autoincrement())
+  nome      String
+  email     String?  @unique
+  endereco  String?
+  telefone  String?
+  cpf       String   @unique
+  senha     String
+  createdAt DateTime @default(now())
+}
+
