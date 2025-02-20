@@ -1,6 +1,7 @@
 import express from "express";
 import authRoutes from "./routes/auth.routes"; // Verifique se está importando corretamente
 import funcionarioRoutes from './routes/funcionario.routes';
+import clienteRoutes from "./routes/cliente.routes";
 
 
 const app = express();
@@ -12,6 +13,8 @@ app.use(express.json());
 app.use("/auth", authRoutes); // Isso vai garantir que as rotas sejam registradas corretamente
 
 app.use('/api', funcionarioRoutes);
+
+app.use(clienteRoutes);
 const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`🔥 Servidor rodando na porta ${PORT}`);
