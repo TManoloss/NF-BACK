@@ -19,8 +19,9 @@ model Admin {
   email String @unique
   senha String
 }
+
 model Funcionario {
-  id       Int      @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   nome      String
   email     String?  @unique
   endereco  String?
@@ -31,7 +32,7 @@ model Funcionario {
 }
 
 model Cliente {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   nome      String
   email     String   @unique
   telefone  String
@@ -39,7 +40,29 @@ model Cliente {
   cpf       String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  orcamentos Orcamento[] // Relação com o modelo Orcamento
 }
 
+model Orcamento {
+  id              Int       @id @default(autoincrement())
+  descricao       String
+  servico         String
+  quantidade      Int       @default(0)
+  data_vencimento DateTime?
+  endereco        String
+  cliente_id      Int? // Tipo alterado para Int
+  cliente         Cliente?  @relation(fields: [cliente_id], references: [id])
+  produtos        Produto[]
+}
 
-
+model Produto {
+  id           Int       @id @default(autoincrement())
+  descricao    String
+  servico      String
+  quantidade   Int       @default(0)
+  categoria    String?
+  status       String?
+  orcamento_id Int
+  orcamento    Orcamento @relation(fields: [orcamento_id], references: [id])
+}

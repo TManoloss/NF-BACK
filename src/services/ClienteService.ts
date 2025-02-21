@@ -13,8 +13,10 @@ export class ClienteService {
     return await prisma.cliente.findMany();
   }
 
-  static async buscarClientePorId(id: string) {
-    return await prisma.cliente.findUnique({ where: { id } });
+  static async buscarClientePorId(id: number | string) {
+    return await prisma.cliente.findUnique({
+      where: { id: Number(id) }, // Convertendo para número
+    });
   }
   static async buscarClientePorNome(nome: string) {
     return await prisma.cliente.findMany({
@@ -28,7 +30,9 @@ export class ClienteService {
   }
   
   
-  static async deletarCliente(id: string) {
-    return await prisma.cliente.delete({ where: { id } });
+  static async deletarCliente(id: number | string) {
+    return await prisma.cliente.delete({
+      where: { id: Number(id) }, // Convertendo para número
+    });
   }
 }
