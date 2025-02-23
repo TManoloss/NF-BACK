@@ -11,7 +11,7 @@ router.get('/clientes', (req, res, next)=>{
 router.get('/clientes/:id', (req, res, next) => {
     ClienteController.buscarClientePorId(req,res)
 })
-router.get("/clientes/buscar", (req, res) => {
+router.get("/cliente/buscar", (req, res) => {
     ClienteController.buscarClientePorNome(req, res);
   });
   

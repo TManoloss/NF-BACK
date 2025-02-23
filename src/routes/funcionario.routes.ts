@@ -8,6 +8,7 @@ router.post('/funcionarios', (req, res, next) => {
   FuncionarioController.criarFuncionario(req, res, next);
 });
 
-router.get('/funcionarios', FuncionarioController.listarFuncionarios);
+router.get('/funcionarios',(req, res, next) =>  
+  {FuncionarioController.listarFuncionarios(req, res,next)});
 
 export default router;

@@ -22,41 +22,45 @@ export class ClienteController {
     }
 
     static async buscarClientePorId(req: Request, res: Response) {
-        try {
-          const { id } = req.params;
-          const cliente = await ClienteService.buscarClientePorId(id);
-    
-          if (!cliente) return res.status(404).json({ message: "Cliente não encontrado" });
-    
-          return res.status(200).json(cliente);
-        } catch (error) {
-          return res.status(500).json({ message: "Erro ao buscar cliente", error });
+      try {
+        const { id } = req.params;
+  
+        if (!id || isNaN(Number(id))) {
+          return res.status(400).json({ message: "ID inválido" });
         }
+  
+        const cliente = await ClienteService.buscarClientePorId(Number(id));
+  
+        if (!cliente) {
+          return res.status(404).json({ message: "Cliente não encontrado" });
+        }
+  
+        return res.status(200).json(cliente);
+      } catch (error) {
+        console.error("Erro ao buscar cliente por ID:", error);
+        return res.status(500).json({ message: "Erro ao buscar cliente por ID", error: (error as any).message });
+      }
     }
     static async buscarClientePorNome(req: Request, res: Response) {
-        try {
-          console.log("Query parameters:", req.query); // Log dos parâmetros de query
-          const { nome } = req.query;
-      
-          // Verifica se o nome é uma string válida
-          if (typeof nome !== "string" || nome.trim() === "") {
-            return res.status(400).json({ message: "Nome inválido" });
-          }
-      
-          // Chama o serviço para buscar o cliente
-          const clientes = await ClienteService.buscarClientePorNome(nome);
-          console.log("Clientes encontrados:", clientes); // Log dos clientes encontrados
-      
-          if (!clientes || clientes.length === 0) {
-            return res.status(404).json({ message: "Nenhum cliente encontrado com esse nome" });
-          }
-      
-          return res.status(200).json(clientes);
-        } catch (error) {
-          console.error("Erro ao buscar cliente por nome:", error);
-          return res.status(500).json({ message: "Erro ao buscar cliente por nome", error });
+      try {
+        const { nome } = req.query;
+  
+        if (!nome || typeof nome !== "string" || nome.trim() === "") {
+          return res.status(400).json({ message: "Nome inválido" });
         }
+  
+        const clientes = await ClienteService.buscarClientePorNome(nome);
+  
+        if (!clientes || clientes.length === 0) {
+          return res.status(404).json({ message: "Nenhum cliente encontrado com esse nome" });
+        }
+  
+        return res.status(200).json(clientes);
+      } catch (error) {
+        console.error("Erro ao buscar cliente por nome:", error);
+        return res.status(500).json({ message: "Erro ao buscar cliente por nome", error: (error as any).message });
       }
+    }
       
     static async deletarCliente(req: Request, res: Response) {
         try {
