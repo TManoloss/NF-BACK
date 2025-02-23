@@ -32,7 +32,7 @@ npm install
 Crie um arquivo **.env** na raiz do projeto e configure a variável de conexão do Prisma com o banco de dados:
 
 ```env
-DATABASE_URL="postgresql://usuario:senha@localhost:5432/nome_do_banco"
+DATABASE_URL="postgresql://admin:secret@localhost:5432/meu_banco"
 ```
 
 ### 5️⃣ **Execute as migrações do Prisma**
@@ -44,7 +44,7 @@ npx prisma migrate dev --name init
 ### 6️⃣ **Inicie a API**
 
 ```sh
-npm run dev
+npx ts-node src/server.ts
 ```
 
 A API estará rodando em **[http://localhost:5000](http://localhost:5000)**.
