@@ -42,30 +42,60 @@ export class OrcamentoService {
           cliente: true,  // Incluir cliente associado
         },
       });
-
+      console.log("✅ Orçamento criado com sucesso:", orcamentoCriado);
       return orcamentoCriado; // Retorna o orçamento com os produtos e cliente
     } catch (error) {
-      console.error("Erro ao criar orçamento:", error);
-      throw new Error("Erro ao criar orçamento");
+        console.error("❌ Erro ao criar orçamento:", error);
+        throw new Error("Erro ao criar orçamento");
     }
   }
 
   static async listarOrcamentos() {
-    return await prisma.orcamento.findMany({
-      include: { produtos: true, cliente: true }, // Usando o nome correto do relacionamento
-    });
+    try {
+      const orcamentos = await prisma.orcamento.findMany({
+        include: { produtos: true, cliente: true },
+      });
+
+      console.log(`📋 Listando ${orcamentos.length} orçamento(s).`);
+      return orcamentos;
+    } catch (error) {
+      console.error("❌ Erro ao listar orçamentos:", error);
+      throw new Error("Erro ao listar orçamentos");
+    }
   }
 
   static async buscarOrcamentoPorId(id: number | string) {
-    return await prisma.orcamento.findUnique({
-      where: { id: Number(id) }, // Convertendo para número
-      include: { produtos: true, cliente: true },
-    });
+    try {
+      const orcamento = await prisma.orcamento.findUnique({
+        where: { id: Number(id) },
+        include: { produtos: true, cliente: true },
+      });
+
+      if (orcamento) {
+        console.log("🔍 Orçamento encontrado:", orcamento);
+      } else {
+        console.log(`⚠ Orçamento com ID ${id} não encontrado.`);
+      }
+
+      return orcamento;
+    } catch (error) {
+      console.error("❌ Erro ao buscar orçamento por ID:", error);
+      throw new Error("Erro ao buscar orçamento");
+    }
   }
 
+
   static async deletarOrcamento(id: number | string) {
-    return await prisma.orcamento.delete({
-      where: { id: Number(id) }, // Convertendo para número
-    });
+    try {
+      const orcamentoDeletado = await prisma.orcamento.delete({
+        where: { id: Number(id) },
+      });
+
+      console.log(`🗑 Orçamento com ID ${id} deletado com sucesso.`);
+      return orcamentoDeletado;
+    } catch (error) {
+      console.error(`❌ Erro ao deletar orçamento com ID ${id}:`, error);
+      throw new Error("Erro ao deletar orçamento");
+    }
   }
 }

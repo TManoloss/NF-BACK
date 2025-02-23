@@ -3,10 +3,11 @@ import authRoutes from "./routes/auth.routes"; // Verifique se está importando 
 import funcionarioRoutes from './routes/funcionario.routes';
 import clienteRoutes from "./routes/cliente.routes";
 import orcamentoRoutes from "./routes/orcamento.routes";
+import cors from "cors";
 
 
 const app = express();
-
+app.use(cors({ origin: "http://localhost:3000" }));
 // Middleware para ler o corpo da requisição em formato JSON
 app.use(express.json());
 
