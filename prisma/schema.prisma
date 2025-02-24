@@ -113,7 +113,9 @@ model OrdemServico {
 model Fornecedor {
   id        Int        @id @default(autoincrement())
   nome      String
-  email     String     @unique
+  email     String?
+  endereco  String?
   telefone  String
+  cnpj      String     @unique
   materiais Material[]
 }

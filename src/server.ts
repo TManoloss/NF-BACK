@@ -5,7 +5,8 @@ import clienteRoutes from "./routes/cliente.routes";
 import orcamentoRoutes from "./routes/orcamento.routes";
 import cors from "cors";
 import pedidoRoutes from "./routes/pedido.routes";
-
+import materialRoutes from "./routes/material.routes";
+import Logger from "./utils/logger";
 
 
 const app = express();
@@ -18,9 +19,16 @@ app.use("/pedidos", pedidoRoutes); // <- Certifique-se de que "/pedidos" está s
 app.use('/api', funcionarioRoutes);
 app.use(orcamentoRoutes);
 app.use(clienteRoutes);
+app.use("/materiais", materialRoutes);
 const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`🔥 Servidor rodando na porta ${PORT}`);
+const server = app.listen(PORT, () => {
+  Logger.info(`🔥 Servidor rodando na porta ${PORT}`);
+});
+process.on('SIGINT', () => {
+  server.close(() => {
+    console.log('Servidor encerrado');
+    process.exit(0);
+  });
 });
 app.use((req, res, next) => {
   console.log(`Requisição recebida: ${req.method} ${req.url}`);
