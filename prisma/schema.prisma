@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -41,7 +35,7 @@ model Cliente {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  orcamentos Orcamento[] // Relação com o modelo Orcamento
+  orcamentos Orcamento[] // Um cliente pode ter vários orçamentos
 }
 
 model Orcamento {
@@ -51,18 +45,75 @@ model Orcamento {
   quantidade      Int       @default(0)
   data_vencimento DateTime?
   endereco        String
-  cliente_id      Int? // Tipo alterado para Int
+  cliente_id      Int? // Relacionamento opcional
   cliente         Cliente?  @relation(fields: [cliente_id], references: [id])
   produtos        Produto[]
+  pedido          Pedido? // Ligação opcional com Pedido (se aprovado)
 }
 
 model Produto {
-  id           Int       @id @default(autoincrement())
-  descricao    String
-  servico      String
-  quantidade   Int       @default(0)
-  categoria    String?
-  status       String?
-  orcamento_id Int
-  orcamento    Orcamento @relation(fields: [orcamento_id], references: [id])
+  id            Int               @id @default(autoincrement())
+  descricao     String
+  servico       String
+  quantidade    Int               @default(0)
+  categoria     String?
+  status        String?
+  orcamento_id  Int
+  orcamento     Orcamento         @relation(fields: [orcamento_id], references: [id])
+  materiais     MaterialProduto[] // Relação com materiais
+  PedidoProduto PedidoProduto[]
+}
+
+model Material {
+  id              Int               @id @default(autoincrement())
+  descricao       String
+  fornecedor_id   Int?
+  fornecedor      Fornecedor?       @relation(fields: [fornecedor_id], references: [id])
+  MaterialProduto MaterialProduto[]
+}
+  
+model MaterialProduto {
+  id         Int      @id @default(autoincrement())
+  produtoId  Int
+  materialId Int
+  quantidade  Int 
+  produto    Produto  @relation(fields: [produtoId], references: [id])
+  material   Material @relation(fields: [materialId], references: [id])
+}
+
+model Pedido {
+  id           Int             @id @default(autoincrement())
+  numero       String          @unique
+  status       String          @default("Pendente")
+  data_criacao DateTime        @default(now())
+  orcamento_id Int             @unique
+  orcamento    Orcamento       @relation(fields: [orcamento_id], references: [id])
+  produtos     PedidoProduto[] // Relação com produtos
+  OrdemServico OrdemServico?
+}
+
+model PedidoProduto {
+  id             Int           @id @default(autoincrement())
+  pedidoId       Int
+  produtoId      Int
+  pedido         Pedido        @relation(fields: [pedidoId], references: [id])
+  produto        Produto       @relation(fields: [produtoId], references: [id])
+  OrdemServico   OrdemServico? @relation(fields: [ordemServicoId], references: [id])
+  ordemServicoId Int?
+}
+
+model OrdemServico {
+  id            Int             @id @default(autoincrement())
+  descricao     String
+  numero_pedido Int             @unique
+  pedido        Pedido          @relation(fields: [numero_pedido], references: [id])
+  produtos      PedidoProduto[] // Ordem de Serviço herda os produtos do Pedido
+}
+
+model Fornecedor {
+  id        Int        @id @default(autoincrement())
+  nome      String
+  email     String     @unique
+  telefone  String
+  materiais Material[]
 }
