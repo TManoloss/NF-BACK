@@ -23,6 +23,7 @@ model Funcionario {
   cpf       String   @unique
   senha     String
   createdAt DateTime @default(now())
+  historicoStatus HistoricoStatusProduto[] // Adicionado: Relacionamento inverso
 }
 
 model Cliente {
@@ -100,6 +101,9 @@ model PedidoProduto {
   produto        Produto       @relation(fields: [produtoId], references: [id])
   OrdemServico   OrdemServico? @relation(fields: [ordemServicoId], references: [id])
   ordemServicoId Int?
+  
+  status         String        @default("Pendente") // Status atual do produto
+  historico      HistoricoStatusProduto[] // Relacionamento com histórico de status
 }
 
 model OrdemServico {
@@ -118,4 +122,16 @@ model Fornecedor {
   telefone  String
   cnpj      String     @unique
   materiais Material[]
+}
+
+model HistoricoStatusProduto {
+  id              Int             @id @default(autoincrement())
+  pedidoProdutoId Int
+  funcionarioId   Int
+  statusAnterior  String
+  statusNovo      String
+  dataAlteracao   DateTime        @default(now())
+
+  pedidoProduto   PedidoProduto   @relation(fields: [pedidoProdutoId], references: [id])
+  funcionario     Funcionario     @relation(fields: [funcionarioId], references: [id])
 }

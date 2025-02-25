@@ -7,7 +7,7 @@ import cors from "cors";
 import pedidoRoutes from "./routes/pedido.routes";
 import materialRoutes from "./routes/material.routes";
 import Logger from "./utils/logger";
-
+import fornecedorRoutes from "./routes/fornecedorRoutes";
 
 const app = express();
 app.use(cors({ origin: "http://localhost:3000" }));
@@ -19,7 +19,8 @@ app.use("/pedidos", pedidoRoutes); // <- Certifique-se de que "/pedidos" está s
 app.use('/api', funcionarioRoutes);
 app.use(orcamentoRoutes);
 app.use(clienteRoutes);
-app.use("/materiais", materialRoutes);
+app.use(materialRoutes);
+app.use(fornecedorRoutes);
 const PORT = 5000;
 const server = app.listen(PORT, () => {
   Logger.info(`🔥 Servidor rodando na porta ${PORT}`);
