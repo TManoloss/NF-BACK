@@ -1,65 +1,66 @@
 import { Request, Response } from "express";
-import MaterialService from "../services/MaterialService";
-import Logger from "../utils/logger";
+import { MaterialService } from "../services/MaterialService";
 
-class MaterialController {
-  async listarMateriais(req: Request, res: Response) {
+export class MaterialController {
+  static async criarMaterial(req: Request, res: Response) {
+    try {
+      const { descricao, produto, fornecedorId } = req.body;
+
+      if (!descricao || !produto || !fornecedorId) {
+        return res.status(400).json({ erro: "Descrição, produto e fornecedor são obrigatórios" });
+      }
+
+      const material = await MaterialService.criarMaterial(descricao, produto, fornecedorId);
+      return res.status(201).json(material);
+    } catch (error) {
+      console.error("Erro ao criar material:", error);
+      return res.status(500).json({ erro: "Erro interno do servidor" });
+    }
+  }
+
+  static async listarMateriais(req: Request, res: Response) {
     try {
       const materiais = await MaterialService.listarMateriais();
-      res.json(materiais);
+      return res.json(materiais);
     } catch (error) {
-      Logger.error("Erro ao listar materiais", error);
-      res.status(500).json({ message: "Erro ao listar materiais" });
+      console.error("Erro ao listar materiais:", error);
+      return res.status(500).json({ erro: "Erro interno do servidor" });
     }
   }
 
-  async obterMaterialPorId(req: Request, res: Response) {
-    const { id } = req.params;
+  static async buscarMaterialPorId(req: Request, res: Response) {
     try {
-      const material = await MaterialService.obterMaterialPorId(Number(id));
+      const id = parseInt(req.params.id);
+      const material = await MaterialService.buscarMaterialPorId(id);
       if (!material) {
-        return res.status(404).json({ message: "Material não encontrado" });
+        return res.status(404).json({ erro: "Material não encontrado" });
       }
-      res.json(material);
+      return res.json(material);
     } catch (error) {
-      Logger.error(`Erro ao buscar material com ID ${id}`, error);
-      res.status(500).json({ message: "Erro ao buscar material" });
+      console.error("Erro ao buscar material:", error);
+      return res.status(500).json({ erro: "Erro interno do servidor" });
     }
   }
 
-  async criarMaterial(req: Request, res: Response) {
-    const { descricao, fornecedorId } = req.body;
+  static async atualizarMaterial(req: Request, res: Response) {
     try {
-      const material = await MaterialService.criarMaterial(descricao, fornecedorId);
-      res.status(201).json(material);
+      const id = parseInt(req.params.id);
+      const material = await MaterialService.atualizarMaterial(id, req.body);
+      return res.json(material);
     } catch (error) {
-      Logger.error("Erro ao criar material", error);
-      res.status(500).json({ message: "Erro ao criar material" });
+      console.error("Erro ao atualizar material:", error);
+      return res.status(500).json({ erro: "Erro interno do servidor" });
     }
   }
 
-  async atualizarMaterial(req: Request, res: Response) {
-    const { id } = req.params;
-    const { descricao, fornecedorId } = req.body;
+  static async deletarMaterial(req: Request, res: Response) {
     try {
-      const material = await MaterialService.atualizarMaterial(Number(id), descricao, fornecedorId);
-      res.json(material);
+      const id = parseInt(req.params.id);
+      await MaterialService.deletarMaterial(id);
+      return res.json({ mensagem: "Material deletado com sucesso" });
     } catch (error) {
-      Logger.error(`Erro ao atualizar material com ID ${id}`, error);
-      res.status(500).json({ message: "Erro ao atualizar material" });
-    }
-  }
-
-  async deletarMaterial(req: Request, res: Response) {
-    const { id } = req.params;
-    try {
-      await MaterialService.deletarMaterial(Number(id));
-      res.status(204).send();
-    } catch (error) {
-      Logger.error(`Erro ao deletar material com ID ${id}`, error);
-      res.status(500).json({ message: "Erro ao deletar material" });
+      console.error("Erro ao deletar material:", error);
+      return res.status(500).json({ erro: "Erro interno do servidor" });
     }
   }
 }
-
-export default new MaterialController();
