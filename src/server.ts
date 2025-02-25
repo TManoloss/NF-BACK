@@ -18,11 +18,11 @@ app.use(express.json());
 app.use("/auth", authRoutes); // Isso vai garantir que as rotas sejam registradas corretamente
 app.use("/pedidos", pedidoRoutes); // <- Certifique-se de que "/pedidos" está sendo usado
 app.use('/api', funcionarioRoutes);
-app.use(orcamentoRoutes);
-app.use(clienteRoutes);
+app.use("/orcamentos", orcamentoRoutes); // Roteamento para /orcamentosapp.use(clienteRoutes);
 app.use(materialRoutes);
 app.use(fornecedorRoutes);
 app.use("/ordem-servico", ordemServicoRoutes);
+app.use(clienteRoutes);
 const PORT = 5000;
 const server = app.listen(PORT, () => {
   Logger.info(`🔥 Servidor rodando na porta ${PORT}`);

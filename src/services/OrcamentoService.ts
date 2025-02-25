@@ -1,54 +1,56 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../config/database"; 
 
-const prisma = new PrismaClient();
 
 export class OrcamentoService {
-  static async criarOrcamento(
-    descricao: string,
-    servico: string,
-    quantidade: number,
-    data_vencimento: Date,
-    endereco: string,
-    cliente_id: number | null,
-    produtos: {
+  static async criarOrcamento(data: {
+    descricao: string;
+    servico: string;
+    quantidade: number;
+    data_vencimento?: Date;
+    endereco: string;
+    cliente_id: number;
+    produtos: Array<{
       descricao: string;
       servico: string;
       quantidade: number;
       categoria?: string;
       status?: string;
-    }[]
-  ) {
+    }>;
+  }) {
     try {
-      const orcamentoCriado = await prisma.orcamento.create({
+      console.log("📌 Criando orçamento...");
+
+      // Valida se há produtos
+      if (!data.produtos || data.produtos.length === 0) {
+        console.error("❌ Erro: O orçamento deve ter pelo menos um produto.");
+        throw new Error("O orçamento deve ter pelo menos um produto."); // Erro específico
+      }
+
+      // Cria o orçamento
+      const orcamento = await prisma.orcamento.create({
         data: {
-          descricao,
-          servico,
-          quantidade,
-          data_vencimento,
-          endereco,
-          cliente_id, // Associando cliente ao orçamento
+          descricao: data.descricao,
+          servico: data.servico,
+          quantidade: data.quantidade,
+          data_vencimento: data.data_vencimento,
+          endereco: data.endereco,
+          cliente_id: data.cliente_id,
           produtos: {
-            create: produtos.map((produto) => ({
-              descricao: produto.descricao,
-              servico: produto.servico,
-              quantidade: produto.quantidade,
-              categoria: produto.categoria,
-              status: produto.status,
-            })),
+            create: data.produtos,
           },
         },
-        include: {
-          produtos: true, // Incluir produtos associados
-          cliente: true,  // Incluir cliente associado
-        },
+        include: { produtos: true },
       });
-      console.log("✅ Orçamento criado com sucesso:", orcamentoCriado);
-      return orcamentoCriado; // Retorna o orçamento com os produtos e cliente
+
+      console.log(`✅ Orçamento criado com sucesso! ID: ${orcamento.id}`);
+      return orcamento;
     } catch (error) {
-        console.error("❌ Erro ao criar orçamento:", error);
-        throw new Error("Erro ao criar orçamento");
+      console.error("❌ Erro ao criar orçamento:", error);
+      throw error; // Lança o erro original
     }
   }
+
+
 
   static async listarOrcamentos() {
     try {

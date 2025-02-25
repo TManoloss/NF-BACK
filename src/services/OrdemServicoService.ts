@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "../config/database"; 
 
 export class OrdemServicoService {
   static async criarOrdemServico(pedido_id: number) {
@@ -91,11 +89,16 @@ export class OrdemServicoService {
     }
   }
 
-  static async atualizarStatusProduto(ordemServicoId: number, produtoId: number, novoStatus: string) {
+  static async atualizarStatusProduto(
+    ordemServicoId: number,
+    produtoId: number,
+    novoStatus: string
+  ) {
     try {
-      console.log(`📌 Atualizando status do produto ID ${produtoId} na ordem de serviço ID ${ordemServicoId}`);
+      console.log(
+        `📌 Atualizando status do produto ID ${produtoId} na ordem de serviço ID ${ordemServicoId}`
+      );
 
-      // Verifica se a ordem de serviço e o produto existem
       const ordemServico = await prisma.ordemServico.findUnique({
         where: { id: ordemServicoId },
         include: { produtos: true },
@@ -112,7 +115,6 @@ export class OrdemServicoService {
         throw new Error("Produto não encontrado na ordem de serviço.");
       }
 
-      // Atualiza o status do produto
       const produtoAtualizado = await prisma.pedidoProduto.update({
         where: { id: produtoId },
         data: { status: novoStatus },

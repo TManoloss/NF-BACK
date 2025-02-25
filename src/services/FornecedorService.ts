@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "../config/database"; 
 
 export class FornecedorService {
   static async criarFornecedor(nome: string, email: string | null, endereco: string | null, telefone: string, cnpj: string) {
