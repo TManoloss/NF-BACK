@@ -3,95 +3,126 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export class OrdemServicoService {
-  // Criar uma Ordem de Serviço baseada no Pedido
-  static async criarOrdemServico(pedidoId: number) {
-    const pedido = await prisma.pedido.findUnique({
-      where: { id: pedidoId },
-      include: { produtos: true },
-    });
+  static async criarOrdemServico(pedido_id: number) {
+    try {
+      console.log(`📌 Criando ordem de serviço para pedido ID: ${pedido_id}`);
 
-    if (!pedido) throw new Error("Pedido não encontrado");
+      // Verifica se o pedido existe
+      const pedido = await prisma.pedido.findUnique({
+        where: { id: pedido_id },
+        include: { produtos: true },
+      });
 
-    // Criar Ordem de Serviço e vincular produtos
-    const ordemServico = await prisma.ordemServico.create({
-      data: {
-        descricao: `Ordem de Serviço para Pedido ${pedido.numero}`,
-        numero_pedido: pedido.id,
-        produtos: {
-          connect: pedido.produtos.map((p) => ({ id: p.id })),
-        },
-      },
-    });
+      if (!pedido) {
+        console.error(`❌ Erro: Pedido ID ${pedido_id} não encontrado.`);
+        throw new Error("Pedido não encontrado.");
+      }
 
-    return ordemServico;
-  }
-
-  // Atualizar status de um produto na OS e salvar histórico
-  static async alterarStatusProduto(
-    pedidoProdutoId: number,
-    novoStatus: string,
-    funcionarioId: number
-  ) {
-    const produtoPedido = await prisma.pedidoProduto.findUnique({
-      where: { id: pedidoProdutoId },
-    });
-
-    if (!produtoPedido) throw new Error("Produto não encontrado no Pedido");
-
-    const statusAnterior = produtoPedido.status;
-
-    await prisma.$transaction([
-      // Atualizar o status do produto no PedidoProduto
-      prisma.pedidoProduto.update({
-        where: { id: pedidoProdutoId },
-        data: { status: novoStatus },
-      }),
-      // Registrar histórico da mudança de status
-      prisma.historicoStatusProduto.create({
+      // Cria a ordem de serviço com os produtos do pedido
+      const ordemServicoCriada = await prisma.ordemServico.create({
         data: {
-          pedidoProdutoId,
-          funcionarioId,
-          statusAnterior,
-          statusNovo: novoStatus,
-        },
-      }),
-    ]);
-
-    return { mensagem: "Status atualizado com sucesso" };
-  }
-
-  // Listar Ordem de Serviço sem expor endereços nem fornecedores
-  static async listarOrdemServico() {
-    return prisma.ordemServico.findMany({
-      include: {
-        pedido: {
-          select: {
-            id: true,
-            numero: true,
-            status: true,
-            produtos: {
-              select: {
-                id: true,
-                produto: {
-                  select: {
-                    descricao: true,
-                    categoria: true,
-                    status: true,
-                    materiais: {
-                      select: {
-                        material: {
-                          select: { descricao: true },
-                        },
-                        quantidade: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
+          descricao: `Ordem de Serviço para Pedido ${pedido.numero}`,
+          numero_pedido: pedido_id,
+          produtos: {
+            connect: pedido.produtos.map((produto) => ({
+              id: produto.id,
+            })),
           },
         },
-      },
-    });
+        include: { produtos: true },
+      });
+
+      console.log(`✅ Ordem de Serviço criada com sucesso! ID: ${ordemServicoCriada.id}`);
+      return ordemServicoCriada;
+    } catch (error) {
+      console.error("❌ Erro ao criar ordem de serviço:", error);
+      throw new Error("Erro ao criar ordem de serviço");
+    }
+  }
+
+  static async listarOrdensServico() {
+    try {
+      console.log("📌 Listando todas as ordens de serviço...");
+      const ordensServico = await prisma.ordemServico.findMany({
+        include: {
+          pedido: {
+            include: { orcamento: { include: { cliente: true } } },
+          },
+          produtos: {
+            include: { produto: { include: { materiais: true } } },
+          },
+        },
+      });
+
+      console.log(`✅ ${ordensServico.length} ordem(ns) de serviço encontrada(s).`);
+      return ordensServico;
+    } catch (error) {
+      console.error("❌ Erro ao listar ordens de serviço:", error);
+      throw new Error("Erro ao listar ordens de serviço");
+    }
+  }
+
+  static async buscarOrdemServicoPorId(id: number) {
+    try {
+      console.log(`📌 Buscando ordem de serviço ID: ${id}`);
+
+      const ordemServico = await prisma.ordemServico.findUnique({
+        where: { id },
+        include: {
+          pedido: {
+            include: { orcamento: { include: { cliente: true } } },
+          },
+          produtos: {
+            include: { produto: { include: { materiais: true } } },
+          },
+        },
+      });
+
+      if (!ordemServico) {
+        console.warn(`⚠️ Ordem de Serviço ID ${id} não encontrada.`);
+        return null;
+      }
+
+      console.log(`✅ Ordem de Serviço encontrada: ID ${ordemServico.id}`);
+      return ordemServico;
+    } catch (error) {
+      console.error(`❌ Erro ao buscar ordem de serviço ID ${id}:`, error);
+      throw new Error("Erro ao buscar ordem de serviço");
+    }
+  }
+
+  static async atualizarStatusProduto(ordemServicoId: number, produtoId: number, novoStatus: string) {
+    try {
+      console.log(`📌 Atualizando status do produto ID ${produtoId} na ordem de serviço ID ${ordemServicoId}`);
+
+      // Verifica se a ordem de serviço e o produto existem
+      const ordemServico = await prisma.ordemServico.findUnique({
+        where: { id: ordemServicoId },
+        include: { produtos: true },
+      });
+
+      if (!ordemServico) {
+        console.error(`❌ Erro: Ordem de Serviço ID ${ordemServicoId} não encontrada.`);
+        throw new Error("Ordem de Serviço não encontrada.");
+      }
+
+      const produto = ordemServico.produtos.find((p) => p.id === produtoId);
+      if (!produto) {
+        console.error(`❌ Erro: Produto ID ${produtoId} não encontrado na ordem de serviço.`);
+        throw new Error("Produto não encontrado na ordem de serviço.");
+      }
+
+      // Atualiza o status do produto
+      const produtoAtualizado = await prisma.pedidoProduto.update({
+        where: { id: produtoId },
+        data: { status: novoStatus },
+      });
+
+      console.log(`✅ Status do produto ID ${produtoId} atualizado para: ${novoStatus}`);
+      return produtoAtualizado;
+    } catch (error) {
+      console.error("❌ Erro ao atualizar status do produto:", error);
+      throw new Error("Erro ao atualizar status do produto");
+    }
   }
 }
