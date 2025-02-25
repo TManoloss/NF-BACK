@@ -1,6 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../config/database"; 
 
-const prisma = new PrismaClient();
 
 export class ClienteService {
   static async criarCliente(nome: string, email: string, telefone: string, endereco: string, cpf: string) {

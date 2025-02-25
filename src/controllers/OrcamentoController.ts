@@ -10,15 +10,15 @@ export class OrcamentoController {
         return res.status(400).json({ message: "Dados incompletos" });
       }
 
-      const orcamento = await OrcamentoService.criarOrcamento(
+      const orcamento = await OrcamentoService.criarOrcamento({
         descricao,
         servico,
         quantidade,
-        new Date(data_vencimento),
+        data_vencimento: new Date(data_vencimento),
         endereco,
         cliente_id,
         produtos
-      );
+      });
 
       return res.status(201).json(orcamento);
     } catch (error) {

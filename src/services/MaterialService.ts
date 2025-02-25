@@ -1,6 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../config/database"; 
 
-const prisma = new PrismaClient();
 
 export class MaterialService {
   static async criarMaterial(descricao: string, produtoId: number, fornecedorId: number) {
