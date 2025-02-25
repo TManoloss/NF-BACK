@@ -147,6 +147,4 @@ A API estará rodando em **[http://localhost:5000](http://localhost:5000)**.
 ## 📄 **Licença**
 
 Este projeto está sob a licença **MIT**.
-```
 
-Sinta-se à vontade para fazer ajustes conforme necessário!
