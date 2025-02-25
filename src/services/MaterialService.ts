@@ -9,7 +9,7 @@ export class MaterialService {
         fornecedor_id: fornecedorId,
         MaterialProduto: {
           create: {
-            produtoId,
+            produtoId: produtoId,
             quantidade: 1, // Defina a quantidade inicial
           },
         },

@@ -5,7 +5,6 @@ export class OrdemServicoService {
     try {
       console.log(`📌 Criando ordem de serviço para pedido ID: ${pedido_id}`);
 
-      // Verifica se o pedido existe
       const pedido = await prisma.pedido.findUnique({
         where: { id: pedido_id },
         include: { produtos: true },
@@ -16,7 +15,16 @@ export class OrdemServicoService {
         throw new Error("Pedido não encontrado.");
       }
 
-      // Cria a ordem de serviço com os produtos do pedido
+      // Verifica se já existe uma ordem de serviço com o mesmo numero_pedido
+      const ordemExistente = await prisma.ordemServico.findUnique({
+        where: { numero_pedido: pedido_id },
+      });
+
+      if (ordemExistente) {
+        console.error(`❌ Erro: Já existe uma ordem de serviço para o pedido ID ${pedido_id}.`);
+        throw new Error("Ordem de serviço já existe para este pedido.");
+      }
+
       const ordemServicoCriada = await prisma.ordemServico.create({
         data: {
           descricao: `Ordem de Serviço para Pedido ${pedido.numero}`,
@@ -95,9 +103,7 @@ export class OrdemServicoService {
     novoStatus: string
   ) {
     try {
-      console.log(
-        `📌 Atualizando status do produto ID ${produtoId} na ordem de serviço ID ${ordemServicoId}`
-      );
+      console.log(`📌 Atualizando status do produto ID ${produtoId} na ordem de serviço ID ${ordemServicoId}`);
 
       const ordemServico = await prisma.ordemServico.findUnique({
         where: { id: ordemServicoId },
