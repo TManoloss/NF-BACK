@@ -8,6 +8,7 @@ import pedidoRoutes from "./routes/pedido.routes";
 import materialRoutes from "./routes/material.routes";
 import Logger from "./utils/logger";
 import fornecedorRoutes from "./routes/fornecedorRoutes";
+import ordemServicoRoutes from "./routes/ordemServico.routes"
 
 const app = express();
 app.use(cors({ origin: "http://localhost:3000" }));
@@ -21,6 +22,7 @@ app.use(orcamentoRoutes);
 app.use(clienteRoutes);
 app.use(materialRoutes);
 app.use(fornecedorRoutes);
+app.use("/ordem-servico", ordemServicoRoutes);
 const PORT = 5000;
 const server = app.listen(PORT, () => {
   Logger.info(`🔥 Servidor rodando na porta ${PORT}`);
