@@ -180,38 +180,3 @@ Os padrões comportamentais tratam da interação entre objetos. Um exemplo no s
 // src/controllers/ClienteController.ts
 const clientes = await ClienteService.listarClientes();
 ```
-
-
-## 🏗 **Padrões de Projeto Utilizados**
-
-### 1. Padrões Criacionais
-
-Os padrões criacionais tratam da criação de objetos de forma que a criação seja independente do sistema que os utiliza. Um exemplo no seu código é o uso do **Factory Method** na classe `ClienteService`, onde você cria instâncias de `Cliente` através do Prisma.
-
-**Exemplo:**
-```typescript
-// src/services/ClienteService.ts
-const clienteCriado = await prisma.cliente.create({
-  data: { nome, email, telefone, endereco, cpf },
-});
-```
-
-### 2. Padrões Estruturais
-
-Os padrões estruturais tratam da composição de classes e objetos para formar estruturas maiores. Um exemplo no seu código é o uso do **Facade**, onde a classe `ClienteController` atua como uma fachada para o `ClienteService`, simplificando a interação com os serviços.
-
-**Exemplo:**
-```typescript
-// src/controllers/ClienteController.ts
-const cliente = await ClienteService.criarCliente(nome, email, telefone, endereco, cpf);
-```
-
-### 3. Padrões Comportamentais
-
-Os padrões comportamentais tratam da interação entre objetos. Um exemplo no seu código é o uso do **Observer**, que pode ser visto na forma como os serviços e controladores interagem. Por exemplo, quando um cliente é criado, o `ClienteController` notifica o `ClienteService` para realizar a ação.
-
-**Exemplo:**
-```typescript
-// src/controllers/ClienteController.ts
-const clientes = await ClienteService.listarClientes();
-```
